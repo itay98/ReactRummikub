@@ -13,6 +13,6 @@ app.use((req, res, next) => {
 });
 app.use('/avatars', avatars);
 app.use('/users', users);
-
+app.get('/', (req, res) => res.send('Hello from Express!'))
 
 app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
