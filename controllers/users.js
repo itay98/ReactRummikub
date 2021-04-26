@@ -5,22 +5,22 @@ const { joinRoom } = require('../utils/rooms');
 setInterval(() => User.destroy({ where: { active: null } }), 1000000000);
 async function joinGame({ id, token, players, points }, res) {
     try {
-        // const user = await User.findByPk(id);
-        // if (user === null)
-        //     res.send('user id does not exist');
-        // else {
-        //     const { token: t, balance, username } = user;
-        //     if (token !== t)
-        //         res.send('problem with credentials');
-        //     else
-        //         if (balance < points)
-        //             res.send('you dont have enough points');
-        //         else {
-        //             const { image } = await user.getAvatar();, username, image
-                    joinRoom({ id }, players, points);
+        const user = await User.findByPk(id);
+        if (user === null)
+            res.send('user id does not exist');
+        else {
+            const { token: t, balance, username } = user;
+            if (token !== t)
+                res.send('problem with credentials');
+            else
+                if (balance < points)
+                    res.send('you dont have enough points');
+                else {
+                    const { image } = await user.getAvatar();
+                    joinRoom({ id, username, image }, players, points);
                     res.send();
-              //  }
-      //  }
+               }
+       }
     } catch (error) {
         console.error(error)
     }

@@ -1,5 +1,5 @@
 const { createGame } = require('../controllers/games');
-const {users} = require('./rooms');
+const { users } = require('./rooms');
 const { drawTile, setRackWithTiles, checkBoard } = require('./game');
 const { updateBalance } = require('../controllers/users');
 const pointRate = { 3: 1, 10: 0.9, 32: 0.875, 100: 0.85 };
