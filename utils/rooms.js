@@ -1,4 +1,4 @@
-const users = require('../socket'), { createAllTiles } = require('./game');
+const { createAllTiles } = require('./game');
 let count = 1;
 class Room {
     constructor(points,num) {
@@ -6,12 +6,12 @@ class Room {
         this.players = [];
         this.turn = 0;
         this.tiles = createAllTiles();
-        this.board = Array(64).fill(false);
+        this.board = Array(64).fill();
         this.points = points;
         this.numOfPlys = num;
     }
 }
-const waitingRoom = {};
+const users = {}, waitingRoom = {};
 function joinRoom(user, players, points) {
     let room = waitingRoom[players + '-' + points];
     if(!room || room.players.length === players){
@@ -21,4 +21,4 @@ function joinRoom(user, players, points) {
     room.players.push(user);
     users[user.id] = room;
 }
-module.exports = { joinRoom };
+module.exports = { joinRoom, users };

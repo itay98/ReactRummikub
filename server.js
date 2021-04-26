@@ -1,6 +1,6 @@
 const express = require('express'), app = express();
 const users = require('./routes/users'), avatars = require('./routes/avatars');
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5000, createS = require('./utils/socket');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
@@ -13,6 +13,6 @@ app.use((req, res, next) => {
 });
 app.use('/avatars', avatars);
 app.use('/users', users);
-app.get('/', (req, res) => res.send('Hello from Express!'+port))
-console.log(process.env.ITAY)
-app.listen(port, () => console.log(`Listening on http://localhost:${port}`));
+
+const server = createS(app);
+server.listen(port, () => console.log(`Listening on http://localhost:${port}`));

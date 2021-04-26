@@ -1,14 +1,37 @@
 const { User, gt, sequelize } = require("../models");
 const { v4 } = require('uuid'), bcrypt = require('bcrypt');
 //const eTP = require('../utils/email'), myEmail = 'React Rummikub itayeshet14@gmail.com';
+const { joinRoom } = require('../utils/rooms');
 setInterval(() => User.destroy({ where: { active: null } }), 1000000000);
+async function joinGame({ id, token, players, points }, res) {
+    try {
+        // const user = await User.findByPk(id);
+        // if (user === null)
+        //     res.send('user id does not exist');
+        // else {
+        //     const { token: t, balance, username } = user;
+        //     if (token !== t)
+        //         res.send('problem with credentials');
+        //     else
+        //         if (balance < points)
+        //             res.send('you dont have enough points');
+        //         else {
+        //             const { image } = await user.getAvatar();, username, image
+                    joinRoom({ id }, players, points);
+                    res.send();
+              //  }
+      //  }
+    } catch (error) {
+        console.error(error)
+    }
+}
 async function addUser(data, res) {
-    try {res.send(process.env.ITAY+'_'+process.env.PORT)
-        // data.token = v4();
-        // data.password = await bcrypt.hash(data.password, 8);
-        // const { id, token, email } = await User.create(data);
-        // //activationEmail(id, token, email);
-        // res.send({ id, token });
+    try {
+        data.token = v4();
+        data.password = await bcrypt.hash(data.password, 8);
+        const { id, token, email } = await User.create(data);
+        //activationEmail(id, token, email);
+        res.send({ id, token });
     } catch (error) {
         console.error(error);
     }
@@ -204,30 +227,7 @@ async function weeklyWinningsLB(res) {
         console.error(error)
     }
 }
-async function joinGame({ id, token, players, points }, res) {
-    try {
-        const user = await User.findByPk(id);
-        if (user === null)
-            res.send('user id does not exist');
-        else {
-            const { token: t, balance, username } = user;
-            if (token !== t)
-                res.send('problem with credentials');
-            else
-                if (balance < points)
-                    res.send('you dont have enough points');
-                else {
-                    const { image } = await user.getAvatar();
-                    joinRoom({ id, username, image }, players, points);
-                    res.send();
-                }
-        }
-    } catch (error) {
-        console.error(error)
-    }
-}
 module.exports = {
     addUser, getUserAttById, checkCred, getUserGames, checkUnique, sendActEm, updateField, unlockPremAv, login,
     forgotCred, resetPass, joinGame, updateBalance, addPoints, contact, topBalanceLB, weeklyWinningsLB
 };
-const { joinRoom } = require('../utils/rooms');
