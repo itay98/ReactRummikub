@@ -3,7 +3,7 @@ const { v4 } = require('uuid'), bcrypt = require('bcrypt');
 //const eTP = require('../utils/email'), myEmail = 'React Rummikub itayeshet14@gmail.com';
 setInterval(() => User.destroy({ where: { active: null } }), 1000000000);
 async function addUser(data, res) {
-    try {console.log(process.env.ITAY,9)
+    try {res.send(process.env.ITAY+'_'+process.env.PORT)
         // data.token = v4();
         // data.password = await bcrypt.hash(data.password, 8);
         // const { id, token, email } = await User.create(data);
