@@ -1,12 +1,6 @@
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize(process.env.DATABASE_URL,{
-  "production": {
-      "dialect":"postgres",
-      "ssl": true,
-      "dialectOptions": {
-          "ssl": true
-      }
-  }
+      dialectOptions: { ssl: true }
 });
 sequelize.authenticate()
   .then(() => console.log('Connection has been established successfully.'))
