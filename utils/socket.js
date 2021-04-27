@@ -4,7 +4,7 @@ const { drawTile, setRackWithTiles, checkBoard } = require('./game');
 const { updateBalance } = require('../controllers/users');
 const pointRate = { 3: 1, 10: 0.9, 32: 0.875, 100: 0.85 };
 function createSocket(app) {
-    const server = require("http").createServer(app);
+    const server = require("http").createServer(app,{cors:{ origin: 'https://react-rummikub.herokuapp.com', methods: ['GET', 'POST'] }});
     const io = require("socket.io")(server);
     io.on("connection", socket => {
         console.log("New client connected");
