@@ -1,6 +1,6 @@
 const { User, gt, sequelize } = require("../models");
 const { v4 } = require('uuid'), bcrypt = require('bcrypt');
-//const eTP = require('../utils/email'), myEmail = 'React Rummikub itayeshet14@gmail.com';
+const eTP = require('../utils/email'), myEmail = 'React Rummikub ' + process.env.MAILUSER;
 const { joinRoom } = require('../utils/rooms');
 setInterval(() => User.destroy({ where: { active: null } }), 1000000000);
 async function joinGame({ id, token, players, points }, res) {
@@ -19,43 +19,28 @@ async function joinGame({ id, token, players, points }, res) {
                     const { image } = await user.getAvatar();
                     joinRoom({ id, username, image }, players, points);
                     res.send();
-               }
-       }
+                }
+        }
     } catch (error) {
         console.error(error)
-    }
-}
-async function addUser(data, res) {
-    try {
-        data.token = v4();
-        data.password = await bcrypt.hash(data.password, 8);
-        const { id, token, email } = await User.create(data);
-        //activationEmail(id, token, email);
-        res.send({ id, token });
-    } catch (error) {
-        console.error(error);
     }
 }
 function activationEmail(id, token, email) {
     eTP.sendMail({
         from: myEmail, to: email, subject: 'Verification', html: `<div dir="ltr" style="text-align: center">
                 <h1>Hello new user!</h1><h2>click the link and wait to see your activation.</h2>
-            <a href="http://localhost:3000/activate?i=${id}&t=${token}">activate account</a></div>`
+            <a href="https://reactrummikub.netlify.app/activate?i=${id}&t=${token}">activate account</a></div>`
     });
 }
-async function contact({ id, token, sub, body }, res) {
+async function addUser(data, res) {
     try {
-        const user = await User.findByPk(id, { attributes: ['token', 'email'] });
-        if (user === null)
-            res.send('user id not exist');
-        else if (user.token !== token)
-            res.send('problem with credentials');
-        else {
-            eTP.sendMail({ to: myEmail, subject: sub, text: body + ' My Email: ' + user.email });
-            res.send('Message sent. We will send you an answer email soon');
-        }
+        data.token = v4();
+        data.password = await bcrypt.hash(data.password, 8);
+        const { id, token, email } = await User.create(data);
+        activationEmail(id, token, email);
+        res.send({ id, token });
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
 }
 async function sendActEm({ id, token }, res) {
@@ -68,6 +53,21 @@ async function sendActEm({ id, token }, res) {
         else {
             activationEmail(id, user.token, user.email);
             res.send('Go to your inbox to activate your account');
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
+async function contact({ id, token, sub, body }, res) {
+    try {
+        const user = await User.findByPk(id, { attributes: ['token', 'email'] });
+        if (user === null)
+            res.send('user id not exist');
+        else if (user.token !== token)
+            res.send('problem with credentials');
+        else {
+            eTP.sendMail({ to: myEmail, subject: sub, text: body + ' My Email: ' + user.email });
+            res.send('Message sent. We will send you an answer email soon');
         }
     } catch (error) {
         console.error(error)
@@ -139,7 +139,7 @@ async function forgotCred(email, res) {
                 from: myEmail, to: email, subject: 'Forgot Credentials', html: `<div dir="ltr" style="text-align: center">
                 <h1>Hello, again! Here to remind you.</h1><h2>in case you forgot your username is:"${username}".</h2>
         <h3>if you forgot your password click the link below to change it to a new password</h3>
-    <a href="http://localhost:3000/password?i=${id}&t=${token}">reset password</a></div>`
+    <a href="https://reactrummikub.netlify.app/password?i=${id}&t=${token}">reset password</a></div>`
             });
             res.send('follow the email we sent you');
         }
@@ -179,7 +179,7 @@ async function updateField({ id, token, ...field }, res) {
     }
 }
 function updateBalance(id, points) {
-    User.update({ balance: sequelize.literal('balance' + points) }, { where: { id } });
+    User.update({ balance: sequelize.literal('balance' + points) }, { where: { id } }).catch(e => console.log(e));
 }
 async function addPoints({ id, points }, res) {
     try {
@@ -205,9 +205,14 @@ async function getUserGames(id, res) {
 }
 async function topBalanceLB(id, res) {
     try {
-        const leaders = await User.findAll({ attributes: ["id", "balance", "username"], include: { association: 'avatar', attributes: ['image'] }, order: [["balance", 'DESC']], limit: 3 });
+        const leaders = await User.findAll({
+            attributes: ["id", "balance", "username"], include: { association: 'avatar', attributes: ['image'] },
+            order: [["balance", 'DESC']], limit: 3
+        });
         if (leaders.every(u => u.id != id)) {
-            var { balance, username, avatar: { image } } = await User.findByPk(id, { attributes: ["balance", "username"], include: { association: 'avatar', attributes: ['image'] } });
+            var { balance, username, avatar: { image } } = await User.findByPk(id, {
+                attributes: ["balance", "username"], include: { association: 'avatar', attributes: ['image'] }
+            });
             var rank = await User.count({ where: { balance: { [gt]: balance } } }) + 1;
         }
         res.send({ leaders, balance, username, image, rank });
@@ -217,11 +222,10 @@ async function topBalanceLB(id, res) {
 }
 async function weeklyWinningsLB(res) {
     try {
-        const [users] = await sequelize.query(`SELECT MIN(u.username) AS username, SUM(g."pointsWon") AS points, MIN(a.image) AS avatar 
-        FROM games g, users u, avatars a
-        WHERE u.id = g."winnerId" AND a.id = u."avatarId" AND g."createdAt" > NOW() - INTERVAL '70 days'
-        GROUP BY u.id 
-        ORDER BY points DESC LIMIT 5`);
+        const [users] = await sequelize.query(`SELECT MIN(u.username) AS username, SUM(g."pointsWon") AS points,
+        MIN(a.image) AS avatar FROM games g, users u, avatars a
+        WHERE u.id = g."winnerId" AND a.id = u."avatarId" AND g."createdAt" > NOW() - INTERVAL '7 days'
+        GROUP BY u.id ORDER BY points DESC LIMIT 5`);
         res.send(users);
     } catch (error) {
         console.error(error)

@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { addUser, getUserAttById,checkCred,getUserGames, checkUnique,updateField,unlockPremAv, login, weeklyWinningsLB,
-    forgotCred, resetPass, joinGame, addPoints,  sendActEm, contact, topBalanceLB } = require("../controllers/users");
+const { addUser, getUserAttById, checkCred, getUserGames, checkUnique, updateField, unlockPremAv, login, weeklyWinningsLB,
+    forgotCred, resetPass, joinGame, addPoints, sendActEm, contact, topBalanceLB } = require("../controllers/users");
 
 router.post('/', (req, res) => addUser(req.body, res));
 router.post('/addPoints', (req, res) => addPoints(req.body, res));

@@ -9,7 +9,9 @@ async function getAvByNN(nickname, res) {
 }
 async function getPremAv(res) {
     try {
-        const avatars = await Avatar.findAll({ attributes: ["id", "image", "nickname"], order: ["nickname"], where: { premium: true } });
+        const avatars = await Avatar.findAll({
+            attributes: ["id", "image", "nickname"], order: ["nickname"], where: { premium: true }
+        });
         res.send(avatars);
     } catch (error) {
         console.error(error)

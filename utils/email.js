@@ -1,11 +1,7 @@
-
 const transporter = require('nodemailer').createTransport({
   host: 'smtp.gmail.com',
-  auth: {
-    user: process.env.MAILUSER,
-    pass: process.env.MAILPASS
-  }
-})
+  auth: { user: process.env.MAILUSER, pass: process.env.MAILPASS }
+});
 
 transporter.verify(error => {
   if (error) {
