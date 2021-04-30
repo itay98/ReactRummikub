@@ -5,7 +5,7 @@ const { updateBalance } = require('../controllers/users');
 const pointRate = { 3: 1, 10: 0.9, 32: 0.875, 100: 0.85 };
 function createSocket(app) {
     const server = require("http").createServer(app);
-    const io = require("socket.io")(server,{cors:{ origin: '*', methods: ['GET', 'POST'] }});
+    const io = require("socket.io")(server, { cors: { origin: 'https://reactrummikub.netlify.app' } });
     io.on("connection", socket => {
         console.log("New client connected");
         let room, player, plys, rId, num;
