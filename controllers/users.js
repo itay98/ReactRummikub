@@ -51,7 +51,7 @@ async function sendActEm({ id, token }, res) {
         else if (user.token !== token)
             res.send('problem with credentials');
         else {
-            activationEmail(id, user.token, user.email,(e,i)=>res.send('Go to your inbox to activate your account'+myEmail+e+i));
+            activationEmail(id, user.token, user.email,(e,i)=>res.send('Go to your inbox to activate your account'+e+i));
            // ;
         }
     } catch (error) {
