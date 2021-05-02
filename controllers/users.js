@@ -25,12 +25,12 @@ async function joinGame({ id, token, players, points }, res) {
         console.error(error)
     }
 }
-function activationEmail(id, token, email) {
+function activationEmail(id, token, email,cb) {
     eTP.sendMail({
         from: myEmail, to: email, subject: 'Verification', html: `<div dir="ltr" style="text-align: center">
                 <h1>Hello new user!</h1><h2>click the link and wait to see your activation.</h2>
             <a href="https://reactrummikub.netlify.app/activate?i=${id}&t=${token}">activate account</a></div>`
-    });
+    },cb);
 }
 async function addUser(data, res) {
     try {
@@ -51,8 +51,8 @@ async function sendActEm({ id, token }, res) {
         else if (user.token !== token)
             res.send('problem with credentials');
         else {
-            activationEmail(id, user.token, user.email);
-            res.send('Go to your inbox to activate your account');
+            activationEmail(id, user.token, user.email,(e,i)=>res.send('Go to your inbox to activate your account'+myEmail+e+i));
+           // ;
         }
     } catch (error) {
         console.error(error)
